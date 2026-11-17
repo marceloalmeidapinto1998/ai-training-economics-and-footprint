@@ -70,37 +70,37 @@ ai-training-economics-and-footprint/
 ### 1. Scaling Laws & The Reporting Transparency Gap (2018–2026)
 Tracks median carbon emissions per model alongside compute growth ($\log_{10}\text{ FLOP}$) and declining industry energy disclosure rates.
 
-![Scaling Laws and Transparency](./images/chart1_scaling_transparency.png)
+![Scaling Laws and Transparency](./05_images/chart1_scaling_transparency.png)
 
 ### 2. Energy Consumption vs. Compute Efficiency (Top 12 Models)
 Compares total training energy (`MWh`) against energy intensity (`MWh` per $10^{24}$ operations) to separate cluster scale from hardware efficiency.
 
-![Energy vs Efficiency](./images/chart2_energy_efficiency.png)
+![Energy vs Efficiency](./05_images/chart2_energy_efficiency.png)
 
 ### 3. Training Budget Breakdown: Hardware CapEx (~90%) vs. Electricity OpEx (~10%)
 Quantifies capital allocation between hardware/cluster infrastructure CapEx and pure electricity OpEx across top disclosed training budgets.
 
-![Training Cost Structure](./images/chart3_cost_structure.png)
+![Training Cost Structure](./05_images/chart3_cost_structure.png)
 
 ### 4. Predictive Scaling Regression & Estimated Undisclosed Frontier Models
 Fits a log-linear scaling model ($R^2$) with a $\pm 1\text{ SD}$ confidence corridor to project the estimated energy demand of major undisclosed frontier releases.
 
-![Predictive Scaling Regression](./images/chart4_predictive_scaling.png)
+![Predictive Scaling Regression](./05_images/chart4_predictive_scaling.png)
 
 ### 5. Geopolitical Grid Trade-Off & 50,000 MWh Site Simulation
 Contrasts historical national training footprints with a 50,000 MWh *what-if* simulation comparing industrial electricity tariffs against grid carbon intensity.
 
-![Geopolitical Grid Trade-Off](./images/chart5_geopolitical_grid.png)
+![Geopolitical Grid Trade-Off](./05_images/chart5_geopolitical_grid.png)
 
 ### 6. AI Governance & Risk: Open-Weights vs. Closed Commercial Releases
 Examines how the market shift from open-weights to closed commercial API releases drives the environmental reporting gap.
 
-![AI Governance and Risk](./images/chart6_governance_risk.png)
+![AI Governance and Risk](./05_images/chart6_governance_risk.png)
 
 ### 7. Competitive Landscape: Top 10 AI Labs (Scale vs. Transparency)
 Benchmarks leading organizations by notable model output, peak compute scale, and energy disclosure transparency.
 
-![Competitive Landscape](./images/chart7_competitive_landscape.png)
+![Competitive Landscape](./05_images/chart7_competitive_landscape.png)
 
 ---
 
