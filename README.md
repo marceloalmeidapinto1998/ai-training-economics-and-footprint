@@ -65,6 +65,13 @@ ai-training-economics-and-footprint/
 
 ---
 
+## Assumptions & Limitations
+
+* **Self-Reporting & Selection Bias:** Disclosed energy figures come primarily from academic labs, open-weights releases, or organizations with favorable efficiency metrics. Closed commercial labs rarely publish power telemetry, meaning estimated figures for undisclosed models represent lower-bound baselines rather than audited consumption.
+* **Data Center PUE & Cooling Overhead:** Where infrastructure Power Usage Effectiveness (PUE) is not explicitly reported by the model developer, energy calculations reflect direct compute cluster draw or standardized industry PUE assumptions, which can vary across hyperscale vs. on-premise facilities.
+* **CapEx Amortization vs. Spot Pricing:** The ~90% CapEx / ~10% OpEx split reflects full hardware acquisition and cluster allocation costs reported in Epoch AI's training cost estimates rather than short-term cloud spot-instance pricing, and excludes non-training R&D, data curation, and post-deployment inference costs.
+* **Grid Average vs. Marginal Emissions:** Carbon footprint estimates use regional average grid carbon intensity (`Dim_Country_Grid`) and do not account for behind-the-meter renewable Power Purchase Agreements (PPAs) or hourly marginal grid dispatch variations.
+
 ## Visual Analytics Gallery
 
 ### 1. Scaling Laws & The Reporting Transparency Gap (2018–2026)
