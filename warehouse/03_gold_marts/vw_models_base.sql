@@ -1,4 +1,4 @@
--- ============================================================================
+﻿-- ============================================================================
 -- SCRIPT: 03_views_analise_models.sql
 -- DATABASE: EpochAI_DW
 -- DESCRIPTION: Semantic analytical layer providing denormalized Star Schema
@@ -58,8 +58,8 @@ SELECT
         ELSE NULL 
     END AS electricity_share_pct,
     f.estimated_co2_tons
-FROM fact_modelos_ia f
-INNER JOIN dim_pais_energia p ON f.pais_id = p.pais_id
+FROM fact_ai_models f
+INNER JOIN dim_country_energy p ON f.country_id = p.country_id
 INNER JOIN dim_hardware h ON f.hardware_id = h.hardware_id;
 GO
 

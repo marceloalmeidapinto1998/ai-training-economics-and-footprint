@@ -1,91 +1,90 @@
-USE EpochAI_DW;
+﻿USE EpochAI_DW;
 GO
 
 /* ============================================================================
    SILVER LAYER: CLEANSING & BUILDING ENRICHED DIMENSION TABLES
    Source: Bronze Staging Tables (dbo.stg_*)
+   Standard: English lowercase snake_case
    ============================================================================ */
 
 -- ----------------------------------------------------------------------------
--- 1. DIM_HARDWARE_SPECS (Physical GPU/TPU Telemetry - Epoch AI)
+-- 1. dim_hardware_specs (Physical GPU/TPU Telemetry - Epoch AI)
 -- ----------------------------------------------------------------------------
-IF OBJECT_ID('dbo.Dim_Hardware_Specs', 'U') IS NOT NULL
-    DROP TABLE dbo.Dim_Hardware_Specs;
+IF OBJECT_ID('dbo.fact_ai_models', 'U') IS NOT NULL
+BEGIN
+    IF OBJECT_ID('dbo.fk_fact_hardware_specs', 'F') IS NOT NULL
+        ALTER TABLE dbo.fact_ai_models DROP CONSTRAINT fk_fact_hardware_specs;
+    IF OBJECT_ID('dbo.fk_fact_grid_enriched', 'F') IS NOT NULL
+        ALTER TABLE dbo.fact_ai_models DROP CONSTRAINT fk_fact_grid_enriched;
+    IF OBJECT_ID('dbo.fk_fact_model_benchmarks', 'F') IS NOT NULL
+        ALTER TABLE dbo.fact_ai_models DROP CONSTRAINT fk_fact_model_benchmarks;
+END
 GO
 
-CREATE TABLE dbo.Dim_Hardware_Specs (
-    Hardware_Key        INT IDENTITY(1,1) PRIMARY KEY,
-    Hardware_Name       NVARCHAR(200) NOT NULL,
-    Manufacturer        NVARCHAR(100) NULL,
-    Hardware_Type       NVARCHAR(100) NULL,
-    Release_Year        INT NULL,
-    TDP_Watts           FLOAT NULL,
-    Peak_BF16_TFLOPS    FLOAT NULL,
-    Peak_FP8_TFLOPS     FLOAT NULL,
-    Memory_GB           FLOAT NULL,
-    Est_Unit_CapEx_USD  FLOAT NULL,
-    Datasheet_URL       NVARCHAR(MAX) NULL,
-    Source_Citation     NVARCHAR(250) NOT NULL
+DROP TABLE IF EXISTS dbo.dim_hardware_specs;
+DROP TABLE IF EXISTS dbo.Dim_Hardware_Specs;
+GO
+
+CREATE TABLE dbo.dim_hardware_specs (
+    hardware_spec_id    INT IDENTITY(1,1) PRIMARY KEY,
+    hardware_name       NVARCHAR(200) NOT NULL,
+    manufacturer        NVARCHAR(100) NULL,
+    hardware_type       NVARCHAR(100) NULL,
+    release_year        INT NULL,
+    tdp_watts           FLOAT NULL,
+    peak_bf16_tflops    FLOAT NULL,
+    peak_fp8_tflops     FLOAT NULL,
+    memory_gb           FLOAT NULL,
+    est_unit_capex_usd  FLOAT NULL,
+    datasheet_url       NVARCHAR(MAX) NULL,
+    source_citation     NVARCHAR(250) NOT NULL
 );
 GO
 
-INSERT INTO dbo.Dim_Hardware_Specs (
-    Hardware_Name,
-    Manufacturer,
-    Hardware_Type,
-    Release_Year,
-    TDP_Watts,
-    Peak_BF16_TFLOPS,
-    Peak_FP8_TFLOPS,
-    Memory_GB,
-    Est_Unit_CapEx_USD,
-    Datasheet_URL,
-    Source_Citation
+INSERT INTO dbo.dim_hardware_specs (
+    hardware_name, manufacturer, hardware_type, release_year, tdp_watts,
+    peak_bf16_tflops, peak_fp8_tflops, memory_gb, est_unit_capex_usd,
+    datasheet_url, source_citation
 )
 SELECT
-    LTRIM(RTRIM(Hardware_name)) AS Hardware_Name,
-    COALESCE(NULLIF(LTRIM(RTRIM(Manufacturer)), ''), 'Unknown') AS Manufacturer,
-    COALESCE(NULLIF(LTRIM(RTRIM(Type)), ''), 'Accelerator') AS Hardware_Type,
-    YEAR(TRY_CAST(Release_date AS DATE)) AS Release_Year,
-    TRY_CAST(TDP_W AS FLOAT) AS TDP_Watts,
-    TRY_CAST(Tensor_FP16_BF16_performance_FLOP_s AS FLOAT) / 1e12 AS Peak_BF16_TFLOPS,
-    TRY_CAST(FP8_performance_FLOP_s AS FLOAT) / 1e12 AS Peak_FP8_TFLOPS,
-    TRY_CAST(Memory_bytes AS FLOAT) / 1073741824.0 AS Memory_GB,
-    TRY_CAST(Release_price_USD AS FLOAT) AS Est_Unit_CapEx_USD,
-    Link_to_datasheet AS Datasheet_URL,
-    'Epoch AI ML Hardware Dataset (epoch.ai)' AS Source_Citation
+    LTRIM(RTRIM(Hardware_name)),
+    COALESCE(NULLIF(LTRIM(RTRIM(Manufacturer)), ''), 'Unknown'),
+    COALESCE(NULLIF(LTRIM(RTRIM(Type)), ''), 'Accelerator'),
+    YEAR(TRY_CAST(Release_date AS DATE)),
+    TRY_CAST(TDP_W AS FLOAT),
+    TRY_CAST(Tensor_FP16_BF16_performance_FLOP_s AS FLOAT) / 1e12,
+    TRY_CAST(FP8_performance_FLOP_s AS FLOAT) / 1e12,
+    TRY_CAST(Memory_bytes AS FLOAT) / 1073741824.0,
+    TRY_CAST(Release_price_USD AS FLOAT),
+    Link_to_datasheet,
+    'Epoch AI ML Hardware Dataset (epoch.ai)'
 FROM dbo.stg_epoch_hardware
 WHERE Hardware_name IS NOT NULL
   AND TRY_CAST(TDP_W AS FLOAT) > 0;
 GO
 
 -- ----------------------------------------------------------------------------
--- 2. DIM_GRID_ENRICHED (Grid Carbon Intensity, Industrial Tariffs & Water WUE)
+-- 2. dim_grid_enriched (Grid Carbon Intensity, Industrial Tariffs & Water WUE)
 -- ----------------------------------------------------------------------------
-IF OBJECT_ID('dbo.Dim_Grid_Enriched', 'U') IS NOT NULL
-    DROP TABLE dbo.Dim_Grid_Enriched;
+DROP TABLE IF EXISTS dbo.dim_grid_enriched;
+DROP TABLE IF EXISTS dbo.Dim_Grid_Enriched;
 GO
 
-CREATE TABLE dbo.Dim_Grid_Enriched (
-    Grid_Key             INT IDENTITY(1,1) PRIMARY KEY,
-    Region_Code          NVARCHAR(20) NOT NULL UNIQUE,
-    Country              NVARCHAR(100) NOT NULL,
-    Carbon_gCO2_kWh      FLOAT NOT NULL,
-    Tariff_USD_MWh       FLOAT NOT NULL,
-    WUE_Liters_kWh       FLOAT NOT NULL,
-    Default_Facility_PUE FLOAT NOT NULL,
-    Source_Citation      NVARCHAR(300) NOT NULL
+CREATE TABLE dbo.dim_grid_enriched (
+    grid_id              INT IDENTITY(1,1) PRIMARY KEY,
+    region_code          NVARCHAR(20) NOT NULL UNIQUE,
+    country              NVARCHAR(100) NOT NULL,
+    carbon_gco2_kwh      FLOAT NOT NULL,
+    tariff_usd_mwh       FLOAT NOT NULL,
+    wue_liters_kwh       FLOAT NOT NULL,
+    default_facility_pue FLOAT NOT NULL,
+    source_citation      NVARCHAR(300) NOT NULL
 );
 GO
 
-INSERT INTO dbo.Dim_Grid_Enriched (
-    Region_Code,
-    Country,
-    Carbon_gCO2_kWh,
-    Tariff_USD_MWh,
-    WUE_Liters_kWh,
-    Default_Facility_PUE,
-    Source_Citation
+INSERT INTO dbo.dim_grid_enriched (
+    region_code, country, carbon_gco2_kwh, tariff_usd_mwh,
+    wue_liters_kwh, default_facility_pue, source_citation
 )
 SELECT
     LTRIM(RTRIM(Region_Code)),
@@ -99,81 +98,72 @@ FROM dbo.stg_grid_intensity_wue;
 GO
 
 -- ----------------------------------------------------------------------------
--- 3. DIM_MODEL_BENCHMARKS (Frontier Evaluation & Capability Consolidation)
+-- 3. dim_model_benchmarks (Frontier Evaluation & Capability Consolidation)
 -- ----------------------------------------------------------------------------
-IF OBJECT_ID('dbo.Dim_Model_Benchmarks', 'U') IS NOT NULL
-    DROP TABLE dbo.Dim_Model_Benchmarks;
+DROP TABLE IF EXISTS dbo.dim_model_benchmarks;
+DROP TABLE IF EXISTS dbo.Dim_Model_Benchmarks;
 GO
 
-CREATE TABLE dbo.Dim_Model_Benchmarks (
-    Benchmark_Key       INT IDENTITY(1,1) PRIMARY KEY,
-    Model_Version       NVARCHAR(250) NOT NULL,
-    Display_Name        NVARCHAR(250) NULL,
-    Model_Group         NVARCHAR(200) NULL,
-    Organization        NVARCHAR(200) NULL,
-    GPQA_Diamond_Score  FLOAT NULL,
-    FrontierMath_Score  FLOAT NULL,
-    SWE_Bench_Score     FLOAT NULL,
-    MMLU_Score          FLOAT NULL,
-    WebDev_Arena_Elo    FLOAT NULL,
-    Composite_Index     FLOAT NULL,
-    Source_Citation     NVARCHAR(250) NOT NULL
+CREATE TABLE dbo.dim_model_benchmarks (
+    benchmark_id        INT IDENTITY(1,1) PRIMARY KEY,
+    model_version       NVARCHAR(250) NOT NULL,
+    display_name        NVARCHAR(250) NULL,
+    model_group         NVARCHAR(200) NULL,
+    organization        NVARCHAR(200) NULL,
+    gpqa_diamond_score  FLOAT NULL,
+    frontiermath_score  FLOAT NULL,
+    swe_bench_score     FLOAT NULL,
+    mmlu_score          FLOAT NULL,
+    webdev_arena_elo    FLOAT NULL,
+    composite_index     FLOAT NULL,
+    source_citation     NVARCHAR(250) NOT NULL
 );
 GO
 
-WITH BaseModels AS (
+WITH base_models AS (
     SELECT DISTINCT
-        LTRIM(RTRIM(model_version)) AS Model_Version,
-        LTRIM(RTRIM(display_name)) AS Display_Name,
-        LTRIM(RTRIM(model_group)) AS Model_Group,
-        LTRIM(RTRIM(organization)) AS Organization
+        LTRIM(RTRIM(model_version)) AS model_version,
+        LTRIM(RTRIM(display_name)) AS display_name,
+        LTRIM(RTRIM(model_group)) AS model_group,
+        LTRIM(RTRIM(organization)) AS organization
     FROM dbo.stg_bench_model_metadata
     WHERE model_version IS NOT NULL
 ),
-GPQA AS (
+gpqa AS (
     SELECT LTRIM(RTRIM(Model_version)) AS mv, MAX(TRY_CAST(mean_score AS FLOAT)) AS score
     FROM dbo.stg_bench_gpqa_diamond GROUP BY LTRIM(RTRIM(Model_version))
 ),
-FMath AS (
+fmath AS (
     SELECT LTRIM(RTRIM(Model_version)) AS mv, MAX(TRY_CAST(mean_score AS FLOAT)) AS score
     FROM dbo.stg_bench_frontiermath GROUP BY LTRIM(RTRIM(Model_version))
 ),
-SWE AS (
+swe AS (
     SELECT LTRIM(RTRIM(Model_version)) AS mv, MAX(TRY_CAST(mean_score AS FLOAT)) AS score
     FROM dbo.stg_bench_swe_bench GROUP BY LTRIM(RTRIM(Model_version))
 ),
-MMLU AS (
+mmlu AS (
     SELECT LTRIM(RTRIM(Model_version)) AS mv, MAX(TRY_CAST(EM AS FLOAT)) AS score
     FROM dbo.stg_bench_mmlu GROUP BY LTRIM(RTRIM(Model_version))
 ),
-Arena AS (
+arena AS (
     SELECT LTRIM(RTRIM(Model_version)) AS mv, MAX(TRY_CAST(Arena_Score AS FLOAT)) AS score
     FROM dbo.stg_bench_arena GROUP BY LTRIM(RTRIM(Model_version))
 )
-INSERT INTO dbo.Dim_Model_Benchmarks (
-    Model_Version,
-    Display_Name,
-    Model_Group,
-    Organization,
-    GPQA_Diamond_Score,
-    FrontierMath_Score,
-    SWE_Bench_Score,
-    MMLU_Score,
-    WebDev_Arena_Elo,
-    Composite_Index,
-    Source_Citation
+INSERT INTO dbo.dim_model_benchmarks (
+    model_version, display_name, model_group, organization,
+    gpqa_diamond_score, frontiermath_score, swe_bench_score,
+    mmlu_score, webdev_arena_elo, composite_index, source_citation
 )
 SELECT
-    b.Model_Version,
-    b.Display_Name,
-    b.Model_Group,
-    b.Organization,
-    g.score AS GPQA_Diamond_Score,
-    f.score AS FrontierMath_Score,
-    s.score AS SWE_Bench_Score,
-    m.score AS MMLU_Score,
-    a.score AS WebDev_Arena_Elo,
-    -- Normalized composite capability index (0-100 scale across available benchmarks)
+    b.model_version,
+    b.display_name,
+    b.model_group,
+    b.organization,
+    g.score,
+    f.score,
+    s.score,
+    m.score,
+    a.score,
     (
         COALESCE(g.score * 100.0, 0) +
         COALESCE(f.score * 100.0, 0) +
@@ -184,14 +174,14 @@ SELECT
         (CASE WHEN f.score IS NOT NULL THEN 1 ELSE 0 END) +
         (CASE WHEN s.score IS NOT NULL THEN 1 ELSE 0 END) +
         (CASE WHEN m.score IS NOT NULL THEN 1 ELSE 0 END), 0
-    ) AS Composite_Index,
-    'Epoch AI Capabilities & Benchmarking Archive (epoch.ai)' AS Source_Citation
-FROM BaseModels b
-LEFT JOIN GPQA g ON b.Model_Version = g.mv
-LEFT JOIN FMath f ON b.Model_Version = f.mv
-LEFT JOIN SWE s ON b.Model_Version = s.mv
-LEFT JOIN MMLU m ON b.Model_Version = m.mv
-LEFT JOIN Arena a ON b.Model_Version = a.mv
+    ),
+    'Epoch AI Capabilities & Benchmarking Archive (epoch.ai)'
+FROM base_models b
+LEFT JOIN gpqa g ON b.model_version = g.mv
+LEFT JOIN fmath f ON b.model_version = f.mv
+LEFT JOIN swe s ON b.model_version = s.mv
+LEFT JOIN mmlu m ON b.model_version = m.mv
+LEFT JOIN arena a ON b.model_version = a.mv
 WHERE g.score IS NOT NULL
    OR f.score IS NOT NULL
    OR s.score IS NOT NULL
@@ -199,10 +189,9 @@ WHERE g.score IS NOT NULL
    OR a.score IS NOT NULL;
 GO
 
--- Silver Layer Row Count Verification
-SELECT 'Dim_Hardware_Specs' AS Table_Name, COUNT(*) AS Row_Count FROM dbo.Dim_Hardware_Specs
+SELECT 'dim_hardware_specs' AS table_name, COUNT(*) AS row_count FROM dbo.dim_hardware_specs
 UNION ALL
-SELECT 'Dim_Grid_Enriched', COUNT(*) FROM dbo.Dim_Grid_Enriched
+SELECT 'dim_grid_enriched', COUNT(*) FROM dbo.dim_grid_enriched
 UNION ALL
-SELECT 'Dim_Model_Benchmarks', COUNT(*) FROM dbo.Dim_Model_Benchmarks;
+SELECT 'dim_model_benchmarks', COUNT(*) FROM dbo.dim_model_benchmarks;
 GO
