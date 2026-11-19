@@ -1,0 +1,8 @@
+Region_Code,Country,Carbon_gCO2_kWh,Tariff_USD_MWh,WUE_Liters_kWh,Default_Facility_PUE,Source_Citation
+US-VA,United States (Virginia),315.0,82.0,1.8,1.2,US EPA eGRID (SRVC) / EIA Industrial / Evaporative WUE Benchmark
+US-TX,United States (Texas),385.0,68.0,2.1,1.25,US EPA eGRID (ERCT) / EIA Industrial / Li et al. Thermal Cooling
+CA-QC,Canada (Quebec),12.0,45.0,0.45,1.12,Canada NIR / Hydro-Quebec Industrial / Free-Cooling WUE
+SE-NORD,Sweden,35.3,96.0,0.3,1.1,Ember OWID Energy / Microsoft & Meta Nordic WUE
+EU-DE,Germany,329.6,165.0,1.15,1.22,Ember OWID Energy / Eurostat Industrial / Google Fleet WUE
+UK-LON,United Kingdom,217.4,195.0,0.95,1.18,Ember OWID Energy / UK DESNZ Industrial Tariff
+CN-EAST,China,525.3,76.0,2.35,1.32,Ember OWID Energy / Li et al. High-Ambient WUE
