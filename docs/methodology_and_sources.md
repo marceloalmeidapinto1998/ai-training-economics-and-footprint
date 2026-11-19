@@ -45,13 +45,26 @@ $$W_{\text{cooling (ML)}} = \frac{E_{\text{facility (MWh)}} \times 1,000 \times 
 ## 3. FinOps & Frontier Capability ROI Formulas
 
 ### 3.1 Electricity OpEx vs. Hardware Infrastructure CapEx
-* **IT Electricity Bill (`electricity_cost_usd`):**
-  $$\text{OpEx}_{\text{IT (USD)}} = E_{\text{IT (MWh)}} \times 1,000 \times \text{Tariff}_{\text{USD/kWh}}$$
-* **Facility Electricity Bill (`facility_electricity_cost_usd`):**
-  $$\text{OpEx}_{\text{facility (USD)}} = E_{\text{facility (MWh)}} \times \text{Tariff}_{\text{USD/MWh}}$$
-* **Amortized Hardware & Cluster Infrastructure (`hardware_infra_cost_usd`):**
-  $$\mathrm{CapEx}_{\mathrm{infra\,(USD)}} = \mathrm{TotalCost}_{\mathrm{USD}} - \mathrm{ElectricityCost}_{\mathrm{USD}}$$
-  *(Enforced in Silver so `total_cost_usd >= electricity_cost_usd` whenever total compute cost is disclosed.)*
+
+- **IT Electricity Bill (`electricity_cost_usd`):**
+
+$$
+\mathrm{OpEx}_{\mathrm{IT\,(USD)}} = E_{\mathrm{IT\,(MWh)}} \times 1,000 \times \mathrm{Tariff}_{\mathrm{USD/kWh}}
+$$
+
+- **Facility Electricity Bill (`facility_electricity_cost_usd`):**
+
+$$
+\mathrm{OpEx}_{\mathrm{facility\,(USD)}} = E_{\mathrm{facility\,(MWh)}} \times \mathrm{Tariff}_{\mathrm{USD/MWh}}
+$$
+
+- **Amortized Hardware & Cluster Infrastructure (`hardware_infra_cost_usd`):**
+
+$$
+\mathrm{CapEx}_{\mathrm{infra\,(USD)}} = \mathrm{TotalCost}_{\mathrm{USD}} - \mathrm{ElectricityCost}_{\mathrm{USD}}
+$$
+
+*(Enforced in Silver so `total_cost_usd >= electricity_cost_usd` whenever total compute cost is disclosed.)*
 
 ### 3.2 Normalized Capability Index & ROI Metrics
 The **`composite_index`** (`0–100`) averages available normalized scores across four frontier evaluations (`gpqa_diamond_score`, `frontiermath_score`, `swe_bench_score`, `mmlu_score`), enabling standardized efficiency ratios in `vw_models_enriched`:
