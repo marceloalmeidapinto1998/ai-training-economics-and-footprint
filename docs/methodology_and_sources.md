@@ -50,13 +50,19 @@ $$W_{\text{cooling (ML)}} = \frac{E_{\text{facility (MWh)}} \times 1,000 \times 
 * **Facility Electricity Bill (`facility_electricity_cost_usd`):**
   $$\text{OpEx}_{\text{facility (USD)}} = E_{\text{facility (MWh)}} \times \text{Tariff}_{\text{USD/MWh}}$$
 * **Amortized Hardware & Cluster Infrastructure (`hardware_infra_cost_usd`):**
-  $$\text{CapEx}_{\text{infra (USD)}} = \text{total\_cost\_usd} - \text{electricity\_cost\_usd}$$
+  $$\mathrm{CapEx}_{\mathrm{infra\,(USD)}} = \mathrm{TotalCost}_{\mathrm{USD}} - \mathrm{ElectricityCost}_{\mathrm{USD}}$$
   *(Enforced in Silver so `total_cost_usd >= electricity_cost_usd` whenever total compute cost is disclosed.)*
 
 ### 3.2 Normalized Capability Index & ROI Metrics
-The **`composite_index`** ($0\text{--}100$) averages available normalized scores across four frontier evaluations (`gpqa_diamond_score`, `frontiermath_score`, `swe_bench_score`, `mmlu_score`), enabling standardized efficiency ratios in `vw_models_enriched`:
+The **`composite_index`** (`0–100`) averages available normalized scores across four frontier evaluations (`gpqa_diamond_score`, `frontiermath_score`, `swe_bench_score`, `mmlu_score`), enabling standardized efficiency ratios in `vw_models_enriched`:
 
-$$\text{USD per Capability Point} = \frac{\text{total\_cost\_usd}}{\text{Composite\_Capability\_Index}}, \qquad \text{CO}_2\text{ Tons per Capability Point} = \frac{\text{pue\_adjusted\_co2\_tons}}{\text{Composite\_Capability\_Index}}$$
+$$
+\mathrm{USD\ per\ Capability\ Point} = \frac{\mathrm{TotalCost}_{\mathrm{USD}}}{\mathrm{CompositeCapabilityIndex}}
+$$
+
+$$
+\mathrm{CO}_2\mathrm{\ Tons\ per\ Capability\ Point} = \frac{\mathrm{PUEAdjustedCO2}_{\mathrm{tons}}}{\mathrm{CompositeCapabilityIndex}}
+$$
 
 ---
 
