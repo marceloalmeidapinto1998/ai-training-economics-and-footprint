@@ -20,25 +20,39 @@ This document details the data lineage, thermodynamic/electrical equations, FinO
 All energy, water, and carbon metrics are computed in the Silver (`warehouse/02_silver_transform/build_fact_models.sql`) and Gold (`warehouse/03_gold_marts/vw_models_enriched.sql`) layers using standard data center thermodynamic principles.
 
 ### 2.1 Power Draw Imputation (`estimated_power_watts`)
-When direct cluster power draw (`Training_power_draw_W`) is disclosed by the model authors, that value is preserved. Otherwise, IT cluster power draw is imputed from accelerator count ($N_{\text{chips}}$), chip Thermal Design Power ($\text{TDP}_{\text{W}}$), and an empirical sustained training utilization factor ($\eta_{\text{load}} = 0.85$):
+When direct cluster power draw (`Training_power_draw_W`) is disclosed by the model authors, that value is preserved. Otherwise, IT cluster power draw is imputed from accelerator count ($N_{\mathrm{chips}}$), chip Thermal Design Power ($\mathrm{TDP}_{\mathrm{W}}$), and an empirical sustained training utilization factor ($\eta_{\mathrm{load}} = 0.85$):
 
-$$P_{\text{IT (W)}} = \begin{cases} P_{\text{reported}} & \text{if disclosed} \\ N_{\text{chips}} \times \text{TDP}_{\text{W}} \times 0.85 & \text{otherwise} \end{cases}$$
+$$
+P_{\mathrm{IT\,(W)}} = \begin{cases} P_{\mathrm{reported}} & \text{if disclosed} \\ N_{\mathrm{chips}} \times \mathrm{TDP}_{\mathrm{W}} \times 0.85 & \text{otherwise} \end{cases}
+$$
 
 ### 2.2 IT vs. Facility-Adjusted Energy (`it_energy_mwh` & `facility_total_energy_mwh`)
-* **IT Cluster Energy (`it_energy_mwh`):** Incorporates a baseline hyperscale Power Usage Effectiveness ($\text{PUE}_{\text{base}} = 1.15$) over total training hours ($t_{\text{hours}}$):
-  $$E_{\text{IT (MWh)}} = \frac{P_{\text{IT (W)}} \times t_{\text{hours}}}{10^6} \times 1.15$$
-* **Regional Facility-Adjusted Energy (`facility_total_energy_mwh`):** Scales IT energy by the regional data center PUE (`default_facility_pue` from `dim_grid_enriched`, defaulting to $1.20$ when regional mapping is unknown):
-  $$E_{\text{facility (MWh)}} = E_{\text{IT (MWh)}} \times \text{PUE}_{\text{region}}$$
+
+- **IT Cluster Energy (`it_energy_mwh`):** Incorporates a baseline hyperscale Power Usage Effectiveness ($\mathrm{PUE}_{\mathrm{base}} = 1.15$) over total training hours ($t_{\mathrm{hours}}$):
+
+$$
+E_{\mathrm{IT\,(MWh)}} = \frac{P_{\mathrm{IT\,(W)}} \times t_{\mathrm{hours}}}{10^6} \times 1.15
+$$
+
+- **Regional Facility-Adjusted Energy (`facility_total_energy_mwh`):** Scales IT energy by the regional data center PUE (`default_facility_pue` from `dim_grid_enriched`, defaulting to $1.20$ when regional mapping is unknown):
+
+$$
+E_{\mathrm{facility\,(MWh)}} = E_{\mathrm{IT\,(MWh)}} \times \mathrm{PUE}_{\mathrm{region}}
+$$
 
 ### 2.3 Carbon Emissions (`pue_adjusted_co2_tons`)
-Total metric tons of $\text{CO}_2$ equivalent emitted during training are derived from facility electricity consumption and regional grid carbon intensity ($I_{\text{grid}}$ in $\text{gCO}_2\text{/kWh}$):
+Total metric tons of $\mathrm{CO}_2$ equivalent emitted during training are derived from facility electricity consumption and regional grid carbon intensity ($I_{\mathrm{grid}}$ in $\mathrm{gCO}_2\mathrm{/kWh}$):
 
-$$\text{CO}_2\text{ (metric tons)} = \frac{E_{\text{facility (MWh)}} \times 1,000 \times I_{\text{grid}}}{10^6}$$
+$$
+\mathrm{CO}_2\mathrm{\ (metric\ tons)} = \frac{E_{\mathrm{facility\,(MWh)}} \times 1,000 \times I_{\mathrm{grid}}}{10^6}
+$$
 
 ### 2.4 Evaporative Water Footprint (`water_footprint_megaliters`)
-On-site cooling tower water consumption in Megaliters ($1\text{ ML} = 10^6\text{ Liters}$) is estimated using regional Water Usage Effectiveness ($\text{WUE}$ in $\text{Liters/kWh}$, fallback $1.80\text{ L/kWh}$):
+On-site cooling tower water consumption in Megaliters ($1\text{ ML} = 10^6\text{ Liters}$) is estimated using regional Water Usage Effectiveness ($\mathrm{WUE}$ in $\mathrm{Liters/kWh}$, fallback $1.80\text{ L/kWh}$):
 
-$$W_{\text{cooling (ML)}} = \frac{E_{\text{facility (MWh)}} \times 1,000 \times \text{WUE}_{\text{region}}}{10^6}$$
+$$
+W_{\mathrm{cooling\,(ML)}} = \frac{E_{\mathrm{facility\,(MWh)}} \times 1,000 \times \mathrm{WUE}_{\mathrm{region}}}{10^6}
+$$
 
 ---
 
