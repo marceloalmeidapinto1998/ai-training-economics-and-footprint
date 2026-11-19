@@ -1,4 +1,4 @@
-﻿import os
+import os
 import nbformat as nbf
 
 os.makedirs("analysis", exist_ok=True)
