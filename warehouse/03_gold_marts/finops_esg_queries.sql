@@ -1,21 +1,10 @@
-/* ============================================================================
-   PROJECT:      AI Training Economics, Energy & Environmental Footprint (EpochAI_DW)
-   LAYER:        Gold Marts — Exploratory Data Analysis & Executive BI
-   FILE:         warehouse/03_gold_marts/finops_esg_queries.sql
-   TARGET VIEW:  dbo.vw_models_enriched (and dbo.dim_grid_enriched for simulations)
-   CONVENTIONS:  English lowercase snake_case, CTE-driven, SQL Server T-SQL
-   DESCRIPTION:  Executive analytical playbook covering FinOps cost structure,
-                 ESG carbon/water footprints, hardware efficiency, and frontier ROI.
-   ============================================================================ */
-
 USE EpochAI_DW;
 GO
 
 -- ============================================================================
 -- SECTION 1: DATA COMPLETENESS & THE AI TRANSPARENCY GAP (2018 - 2026)
--- Business Question: How has model scale evolved, and how fast is public
---                    disclosure of energy and cost metrics declining?
--- Techniques:        Conditional aggregation, YoY rolling metrics, NULL profiling
+-- Business Question: How has model scale evolved, and how has the public
+--                    disclosure of energy and cost metrics shifted over time?
 -- ============================================================================
 WITH yearly_disclosure AS (
     SELECT
@@ -34,21 +23,19 @@ SELECT
     publication_year,
     total_models,
     disclosed_energy_models,
-    ROUND(100.0 * disclosed_energy_models / NULLIF(total_models, 0), 1) AS energy_disclosure_pct,
+    CAST(ROUND(100.0 * disclosed_energy_models / NULLIF(total_models, 0), 2) AS DECIMAL(5, 2)) AS energy_disclosure_pct,
     disclosed_cost_models,
-    ROUND(100.0 * disclosed_cost_models / NULLIF(total_models, 0), 1) AS cost_disclosure_pct,
+    CAST(ROUND(100.0 * disclosed_cost_models / NULLIF(total_models, 0), 2) AS DECIMAL(5, 2)) AS cost_disclosure_pct,
     avg_log10_flop,
     peak_log10_flop
 FROM yearly_disclosure
 ORDER BY publication_year ASC;
 GO
 
-
 -- ============================================================================
 -- SECTION 2: FINOPS — TRAINING BUDGET BREAKDOWN (CAPEX VS. OPEX)
 -- Business Question: Across the highest-budget AI training runs, what share
 --                    goes to hardware CapEx vs. facility electricity OpEx?
--- Techniques:        Financial ratio decomposition, Top-N ranking
 -- ============================================================================
 SELECT TOP 15
     model_name,
@@ -72,7 +59,6 @@ GO
 -- SECTION 3: ESG & HARDWARE EFFICIENCY — SCALE VS. ENERGY INTENSITY
 -- Business Question: Which accelerator families consume the most aggregate
 --                    energy vs. which deliver the lowest energy per 10^24 FLOP?
--- Techniques:        Physics intensity normalization (MWh / 10^24 FLOP)
 -- ============================================================================
 SELECT
     chip_family,
@@ -105,7 +91,6 @@ GO
 -- Business Question: What is the full facility-adjusted footprint (MWh, water
 --                    cooling Megaliters, CO2 tons, and US household equivalents)
 --                    of the most energy-intensive models?
--- Techniques:        Multi-metric ESG impact profiling
 -- ============================================================================
 SELECT TOP 15
     model_name,
@@ -131,7 +116,6 @@ GO
 -- Business Question: If we train a standardized 50,000 MWh frontier model across
 --                    each regional grid, how do electricity cost, CO2 emissions,
 --                    and cooling water consumption compare?
--- Techniques:        Scenario modeling directly against dim_grid_enriched
 -- ============================================================================
 WITH workload_baseline AS (
     SELECT 50000.0 AS it_workload_mwh
@@ -157,7 +141,6 @@ GO
 -- SECTION 6: FRONTIER LAB BENCHMARKING & CAPABILITY ROI (PARETO LEADERS)
 -- Business Question: Which frontier models deliver the highest benchmark
 --                    capability per million USD spent and per ton of CO2?
--- Techniques:        Window functions (DENSE_RANK), composite ROI efficiency
 -- ============================================================================
 SELECT TOP 20
     DENSE_RANK() OVER (ORDER BY Composite_Capability_Index DESC) AS capability_rank,
@@ -181,7 +164,6 @@ GO
 -- SECTION 7: GOVERNANCE & OPEN-WEIGHTS VS. CLOSED COMMERCIAL APIs
 -- Business Question: How does model accessibility (open weights vs. closed API)
 --                    correlate with compute scale and environmental transparency?
--- Techniques:        Categorical segmentation, transparency rate comparison
 -- ============================================================================
 SELECT
     COALESCE(NULLIF(LTRIM(RTRIM(open_weights)), ''), 'Unknown / Unspecified') AS open_weights_status,
