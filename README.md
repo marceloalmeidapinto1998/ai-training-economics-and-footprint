@@ -1,19 +1,19 @@
 ﻿# AI Training Economics, Energy & Environmental Footprint
 
-An end-to-end **Data Engineering, FinOps & ESG Analytics** platform measuring how much it costs—financially, energetically, thermally (water cooling), and environmentally—to train and serve frontier AI models. Built on a **SQL Server Medallion Data Warehouse (`EpochAI_DW`)** and analyzed through **Python** statistical modeling, Pareto optimization, and minimalist **Plotly** visualizations.
+An end-to-end **Data Engineering, FinOps & ESG Analytics** platform measuring how much it costs—financially, energetically, thermally (water cooling), and environmentally—to train and serve frontier AI models. Built on a **SQL Server Data Warehouse (`EpochAI_DW`)** and analyzed through **Python** statistical modeling, Pareto optimization, and **Plotly** visualizations.
 
-## Executive Summary & Key Findings
+## Summary & Key Findings
 
-- **The AI Transparency Gap:** While median carbon emissions per disclosed model surged past **1,900 metric tons of** $\text{CO}_2$ in 2026*, public energy disclosure across the industry dropped from **32% (2022)** to **5% (2026 YTD)** as frontier development shifted toward closed commercial APIs.
-- **Facility PUE & Evaporative Water Footprint:** Integrating regional data center Power Usage Effectiveness (`PUE`) and Water Usage Effectiveness (`WUE`) reveals massive secondary environmental loads—for instance, **Grok 3** accounts for **327,735 MWh** of facility-adjusted energy, **589.9 Megaliters** of cooling water, and **103,237 metric tons of** $\text{CO}_2$.
-- **Cluster Scale vs. Hardware Efficiency:** Newer accelerators (`NVIDIA H100/H200/B200` and `Google TPUs`) draw more total electricity due to massive cluster sizes, yet require significantly **less energy per** $10^{24}$ **operations** than legacy GPUs.
-- **Training Budget Breakdown (~86% CapEx / ~14% OpEx):** Across the Top 10 disclosed frontier training budgets, hardware and cluster infrastructure account for **~86%** of dollar-weighted capital expenditure, whereas pure electricity bills represent **~14%**.
-- **Predictive Scaling Laws ($R^2$) & Uncertainty Bounds:** Log-linear OLS regression with **80% and 95% Prediction Intervals** quantifies the hidden electricity demand of undisclosed frontier releases (such as **GPT-6 Astra**, **Grok 4**, **GPT-4.5**, and **GPT-5**) from their reported compute scale (`FLOPs`).
-- **Pareto Efficiency Frontier & Geopolitical Site Selection:** Cross-referencing frontier benchmarks (`GPQA Diamond`, `FrontierMath`, `SWE-Bench`, `MMLU`) against training costs identifies Pareto-optimal models (led by **DeepSeek-R1** and the **Llama** family), while regional grid simulations show the **United States concentrates 96%** of historical disclosed energy whereas **Canada** offers the optimal balance of low electricity tariffs and clean hydro/nuclear power.
+- **The AI Transparency Gap:** Public energy disclosure across the industry dropped from **32% (2022)** to **5% (2026 YTD)** as frontier development shifted toward closed commercial APIs.
+- **Hidden Cooling, Water an Carbon Costs:Facility PUE & Evaporative Water Footprint:** Training a frontier model takes more than chip power—data center cooling and grid losses add huge hidden costs. Training Grok 3 used **327,735 MWh** of electricity (about a year's power for ~32,000 homes), evaporated 589.9 million liters of cooling water (~235 Olympic pools), and released **103,237 metric tons of** $\text{CO}_2$.
+- Newer chips (NVIDIA H100/H200/B200 and Google TPUs) use more total power because they run in huge clusters, yet they do more work per unit of energy than older GPUs.
+- Across the 10 largest disclosed training budgets, about 86% of total spending goes to hardware and cluster setup, while roughly 14% goes to electricity bills.
+- **Estimating Power for Secret Models:** Using known compute sizes (FLOPs) from disclosed runs, a statistical scaling model estimates likely electricity use—and probable ranges—for major models that do not publish energy numbers (such as **GPT-6 Astra**, **Grok 4**, **GPT-4.5**, and **GPT-5**).
+- While the US accounts for most past disclosed energy, Canada stands out for combining lower power costs with cleaner electricity.
 
 ## Data Architecture & Tech Stack
 
-### 1. SQL Server Medallion Data Warehouse (`EpochAI_DW`)
+### 1. SQL Server Data Warehouse
 
 Raw multi-source datasets are ingested and refined across three governed layers using standardized lowercase `snake_case` naming conventions:
 
@@ -37,7 +37,7 @@ ai-training-economics-and-footprint/
 │   └── eda_ai_energy_economics.ipynb    # Consolidated EDA, OLS scaling, Pareto & TCO analysis (Charts 1–9)
 ├── assets/
 │   ├── diagrama_er_ssms.png             # SQL Server Star Schema ER diagram
-│   └── charts/                          # All 9 print-ready minimalist Plotly PNG visualizations
+│   └── charts/                          # All 9 print-ready Plotly PNG visualizations
 │       ├── chart1_scaling_transparency.png
 │       ├── chart2_energy_efficiency.png
 │       ├── chart3_cost_structure.png
@@ -72,7 +72,7 @@ ai-training-economics-and-footprint/
 
 ## Visual Analytics Gallery
 
-### 1. Scaling Laws & The Reporting Transparency Gap (2018–2026*)
+### 1. Reporting Transparency Gap (2018–2026*)
 Tracks median carbon emissions per model alongside compute growth ($\log_{10}\text{ FLOP}$) and declining industry energy disclosure rates.
 ![Scaling Laws & The Reporting Transparency Gap](assets/charts/chart1_scaling_transparency.png)
 
@@ -80,7 +80,7 @@ Tracks median carbon emissions per model alongside compute growth ($\log_{10}\te
 Compares total training energy (`MWh`) against energy intensity (`MWh` per $10^{24}$ operations) to separate cluster scale from hardware efficiency.
 ![Energy Consumption vs. Compute Efficiency](assets/charts/chart2_energy_efficiency.png)
 
-### 3. Training Budget Breakdown: Hardware CapEx (~86%) vs. Electricity OpEx (~14%)
+### 3. Hardware CapEx (~86%) vs. Electricity OpEx (~14%)
 Quantifies capital allocation between hardware/cluster infrastructure CapEx and pure electricity OpEx across the Top 10 disclosed training budgets.
 ![Training Budget Breakdown](assets/charts/chart3_cost_structure.png)
 
@@ -92,15 +92,15 @@ Fits a log-linear scaling model across modern runs ($\ge 10^{21}$ FLOP) with a $
 Contrasts historical national training energy concentration with a 50,000 MWh *what-if* simulation comparing industrial electricity tariffs against grid carbon intensity.
 ![Geopolitical Grid Trade-Off](assets/charts/chart5_geopolitical_grid.png)
 
-### 6. AI Governance & Risk: Open-Weights vs. Closed Commercial Releases
+### 6. Open-Weights vs. Closed Commercial Releases
 Examines how the market shift from open-weights (`56%` in 2020 to `35%` in 2026*) to closed commercial API releases drives the environmental reporting gap.
 ![AI Governance & Risk](assets/charts/chart6_governance_risk.png)
 
-### 7. Competitive Landscape: Top 10 AI Labs (Scale vs. Transparency)
+### 7. Top 10 AI Labs (Scale vs. Transparency)
 Benchmarks consolidated leading organizations (`Google / DeepMind`, `OpenAI`, `Meta / FAIR`, etc.) by notable model output, peak compute scale, and energy disclosure transparency.
 ![Competitive Landscape](assets/charts/chart7_competitive_landscape.png)
 
-### 8. Physics-Informed Energy Scaling Law & Prediction Uncertainty Bands
+### 8. Energy Scaling Law & Prediction Uncertainty Bands
 Models facility-adjusted energy (`MWh`) against training compute with **80% and 95% Prediction Intervals** and household electricity equivalents (`1,000` to `10,000` homes/year) across disclosed and estimated frontier models.
 ![Physics-Informed Energy Scaling Law](assets/charts/chart8_imputation_uncertainty.png)
 
