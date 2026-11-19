@@ -183,7 +183,7 @@ Evaluates frontier models on `Composite_Capability_Index` ($0\text{--}100$) vers
 
 ## Data Sources & Methodology
 
-Detailed physics equations, FinOps formulas, and full dataset citations are documented in [docs/methodology_and_sources.md](./docs/methodology_and_sources.md).
+Detailed physics equations, FinOps formulas, and full dataset citations are documented in [docs/methodology_and_sources.md](docs/methodology_and_sources.md).
 
 * **Epoch AI — Notable AI Models & ML Hardware Datasets:** <https://epoch.ai/data/>
 
