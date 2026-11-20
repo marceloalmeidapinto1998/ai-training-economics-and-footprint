@@ -1,21 +1,22 @@
-﻿# AI Training Economics, Energy & Environmental Footprint
+﻿## The Real Cost of Training Frontier AI Models
 
-An end-to-end **Data Engineering, FinOps & ESG Analytics** platform measuring how much it costs—financially, energetically, thermally (water cooling), and environmentally—to train and serve frontier AI models. Built on a **SQL Server Data Warehouse (`EpochAI_DW`)** and analyzed through **Python** statistical modeling, Pareto optimization, and **Plotly** visualizations.
+An end-to-end **FinOps & ESG Analytics** platform measuring how much it costs—financially, energetically, thermally (water cooling), and environmentally—to train and serve frontier AI models. Built on a **SQL Server Data Warehouse** and analyzed through **Python** statistical modeling, Pareto optimization, and **Plotly** visualizations.
 
-## Summary & Key Findings
+### Summary & Key Findings
 
 - **The AI Transparency Gap:** Public energy disclosure across the industry dropped from **32% (2022)** to **5% (2026 YTD)** as frontier development shifted toward closed commercial APIs.
-- **Hidden Cooling, Water an Carbon Costs:Facility PUE & Evaporative Water Footprint:** Training a frontier model takes more than chip power—data center cooling and grid losses add huge hidden costs. Training Grok 3 used **327,735 MWh** of electricity (about a year's power for ~32,000 homes), evaporated 589.9 million liters of cooling water (~235 Olympic pools), and released **103,237 metric tons of** $\text{CO}_2$.
-- Newer chips (NVIDIA H100/H200/B200 and Google TPUs) use more total power because they run in huge clusters, yet they do more work per unit of energy than older GPUs.
-- Across the 10 largest disclosed training budgets, about 86% of total spending goes to hardware and cluster setup, while roughly 14% goes to electricity bills.
-- **Estimating Power for Secret Models:** Using known compute sizes (FLOPs) from disclosed runs, a statistical scaling model estimates likely electricity use—and probable ranges—for major models that do not publish energy numbers (such as **GPT-6 Astra**, **Grok 4**, **GPT-4.5**, and **GPT-5**).
-- While the US accounts for most past disclosed energy, Canada stands out for combining lower power costs with cleaner electricity.
+- Training a frontier model takes more than chip power - cooling and grid losses add massive hidden costs. For example, training Grok 3 consumed **327,735 MWh** of electricity (a full year of power for ~32,000 homes), evaporated **589.9 million liters** of water (~235 Olympic pools), and released **103,237 metric tons of** $\text{CO}_2$.
+- Newer chips use more total power because they run in massive clusters, yet they deliver more work per unit of energy than older GPUs.
+- CapEx represents **~86%** of total training costs, compared to **14%** for power consumption.
+- The **US** accounts for the vast majority of disclosed AI power consumption to date.
+- **Canada** stands out by combining lower electricity costs with a significantly cleaner power grid.
+- Using public data on how much computing power known AI models require, a **forecasting model** estimates the electricity footprint of major undisclosed models like GPT-6 Astra, Grok 4, GPT-4.5, and GPT-5.
 
-## Data Architecture & Tech Stack
+### Data Architecture
 
-### 1. SQL Server Data Warehouse
+#### 1. Data Warehouse
 
-Raw multi-source datasets are ingested and refined across three governed layers using standardized lowercase `snake_case` naming conventions:
+Raw multi-source datasets are ingested and refined across three governed layers:
 
 - **Bronze Layer (`data/01_bronze_raw/` & `dbo.stg_*`):** Immutable raw ingestion of Epoch AI Models, ML Hardware (`153` accelerators), Frontier Benchmarks (`534` evaluated models), and Regional Grid Carbon/Water/Tariff telemetry (`7` regions) with UTC audit timestamps (`_ingested_at_utc`) and source lineage (`_source_file`).
 - **Silver Layer (`warehouse/02_silver_transform/`):** Normalized Star Schema combining `fact_ai_models` with cleansed, deduplicated dimension tables linked via Foreign Keys:
@@ -25,11 +26,11 @@ Raw multi-source datasets are ingested and refined across three governed layers 
 - **Gold Layer (`warehouse/03_gold_marts/vw_models_enriched.sql`):** Unified semantic view computing facility-adjusted energy (`facility_total_energy_mwh`), evaporative water footprint (`water_footprint_megaliters`), PUE-adjusted $\text{CO}_2$ emissions (`pue_adjusted_co2_tons`), CapEx/OpEx splits, and capability ROI (`usd_per_capability_point`, `co2_tons_per_capability_point`).
 - **Automated Data Quality Governance (`warehouse/04_tests/data_quality_assertions.sql`):** SQL audit suite enforcing foreign-key integrity, physical bounds (`PUE`, `TDP`), and FinOps cost consistency (`6/6 PASS`).
 
-### Star Schema & Entity-Relationship Model
+#### Star Schema & Entity-Relationship Model
 
 ![SQL Server Star Schema ER Diagram](assets/diagrama_er_ssms.png)
 
-## Repository Structure
+### Repository Structure
 
 ```text
 ai-training-economics-and-footprint/
@@ -70,59 +71,51 @@ ai-training-economics-and-footprint/
 └── README.md
 ```
 
-## Visual Analytics Gallery
+### What the Data Shows
 
-### 1. Reporting Transparency Gap (2018–2026*)
-Tracks median carbon emissions per model alongside compute growth ($\log_{10}\text{ FLOP}$) and declining industry energy disclosure rates.
+#### 1. Transparency Gap (2018–2026*)
 ![Scaling Laws & The Reporting Transparency Gap](assets/charts/chart1_scaling_transparency.png)
 
-### 2. Energy Consumption vs. Compute Efficiency (Top 12 Models)
-Compares total training energy (`MWh`) against energy intensity (`MWh` per $10^{24}$ operations) to separate cluster scale from hardware efficiency.
+#### 2. Energy Consumption vs. Compute Efficiency
 ![Energy Consumption vs. Compute Efficiency](assets/charts/chart2_energy_efficiency.png)
 
-### 3. Hardware CapEx (~86%) vs. Electricity OpEx (~14%)
-Quantifies capital allocation between hardware/cluster infrastructure CapEx and pure electricity OpEx across the Top 10 disclosed training budgets.
+#### 3. CapEx vs. Electricity costs
 ![Training Budget Breakdown](assets/charts/chart3_cost_structure.png)
 
-### 4. Predictive Scaling Regression & Estimated Undisclosed Frontier Models
-Fits a log-linear scaling model across modern runs ($\ge 10^{21}$ FLOP) with a $\pm 1\text{ SD}$ estimation corridor to project electricity consumption for top undisclosed frontier releases.
+#### 4. Estimating Power Use
 ![Predictive Scaling Regression](assets/charts/chart4_predictive_scaling.png)
 
-### 5. Geopolitical Grid Trade-Off & 50,000 MWh Site Simulation
+#### 5. Comparing Countries
 Contrasts historical national training energy concentration with a 50,000 MWh *what-if* simulation comparing industrial electricity tariffs against grid carbon intensity.
 ![Geopolitical Grid Trade-Off](assets/charts/chart5_geopolitical_grid.png)
 
-### 6. Open-Weights vs. Closed Commercial Releases
-Examines how the market shift from open-weights (`56%` in 2020 to `35%` in 2026*) to closed commercial API releases drives the environmental reporting gap.
+#### 6. Open vs. Closed Models
 ![AI Governance & Risk](assets/charts/chart6_governance_risk.png)
 
-### 7. Top 10 AI Labs (Scale vs. Transparency)
-Benchmarks consolidated leading organizations (`Google / DeepMind`, `OpenAI`, `Meta / FAIR`, etc.) by notable model output, peak compute scale, and energy disclosure transparency.
+#### 7. Ranking the Top AI Labs on Scale and Transparency
 ![Competitive Landscape](assets/charts/chart7_competitive_landscape.png)
 
-### 8. Energy Scaling Law & Prediction Uncertainty Bands
-Models facility-adjusted energy (`MWh`) against training compute with **80% and 95% Prediction Intervals** and household electricity equivalents (`1,000` to `10,000` homes/year) across disclosed and estimated frontier models.
+#### 8. Estimating Power Growth
 ![Physics-Informed Energy Scaling Law](assets/charts/chart8_imputation_uncertainty.png)
 
-### 9. AI Economics Pareto Frontier: Capability Index vs. Training Cost
-Evaluates frontier models on `Composite_Capability_Index` ($0\text{--}100$) versus estimated training cost (`USD`) to identify the cost-efficiency Pareto frontier.
+#### 9. Cost vs. Performance: Finding the Most Efficient AI Models
 ![AI Economics Pareto Frontier](assets/charts/chart9_pareto_frontier.png)
 
-## Assumptions & Limitations
+### Assumptions
 
-- **Self-Reporting & Selection Bias:** Disclosed energy figures come primarily from academic labs, open-weights releases, or organizations with favorable efficiency metrics. Closed commercial labs rarely publish power telemetry, meaning estimated figures for undisclosed models represent baseline projections rather than audited consumption.
-- **Data Center PUE & Water Cooling (WUE):** Facility energy and evaporative water consumption incorporate regional `default_facility_pue` and `wue_liters_kwh` benchmarks (`dim_grid_enriched`), which vary depending on hyperscale closed-loop cooling versus evaporative cooling towers.
-- **CapEx Amortization vs. Spot Pricing:** The ~86% CapEx / ~14% OpEx split reflects full hardware acquisition and cluster allocation costs reported in Epoch AI's training cost estimates rather than short-term cloud spot-instance pricing, and excludes non-training R&D, data curation, and post-deployment inference costs (modeled separately in the 12-month lifecycle TCO simulation).
-- **Grid Average vs. Marginal Emissions:** Carbon footprint estimates use regional average grid carbon intensity (`dim_grid_enriched`) and do not account for behind-the-meter renewable Power Purchase Agreements (PPAs) or hourly marginal grid dispatch variations.
+- Public power figures come mostly from academic labs, open-weights releases, or organizations with favorable efficiency numbers. Because closed commercial labs rarely share power telemetry, figures for undisclosed models are baseline estimates rather than audited totals.
+- Total electricity and evaporated water estimates rely on regional averages for facility efficiency and water use. Actual water consumption varies depending on whether a data center uses closed-loop cooling or evaporative cooling towers.
+- This cost split is based on full hardware and cluster allocation estimates from Epoch AI - not short-term cloud spot pricing. It covers training runs only, excluding R&D salaries, data preparation, and post-launch inference.
+- Emissions estimates use regional average grid carbon intensity. They do not reflect private renewable energy contracts (PPAs) or hour-by-hour fluctuations in the power grid.
 
-## How to Reproduce
+### How to Reproduce
 
-### Prerequisites
+#### Prerequisites
 
 - **Microsoft SQL Server** (Express, Developer, or Enterprise) + **SQL Server Management Studio (SSMS)**
 - **Python 3.10+** with **ODBC Driver 17 or 18 for SQL Server**
 
-### Step-by-Step Setup
+### #Step-by-Step Setup
 
 1. **Clone & Configure Environment:**
 
@@ -162,7 +155,7 @@ Evaluates frontier models on `Composite_Capability_Index` ($0\text{--}100$) vers
 
    Open `analysis/eda_ai_energy_economics.ipynb` in VS Code or Jupyter and click **Run All** to reproduce all 9 visualizations and the 12-month lifecycle TCO simulation.
 
-## Data Sources & Methodology
+### Data Sources & Methodology
 
 Detailed physics equations, FinOps formulas, and full dataset citations are documented in [docs/methodology_and_sources.md](docs/methodology_and_sources.md).
 
