@@ -86,7 +86,6 @@ ai-training-economics-and-footprint/
 ![Predictive Scaling Regression](assets/charts/chart4_predictive_scaling.png)
 
 #### 5. Comparing Countries
-Contrasts historical national training energy concentration with a 50,000 MWh *what-if* simulation comparing industrial electricity tariffs against grid carbon intensity.
 ![Geopolitical Grid Trade-Off](assets/charts/chart5_geopolitical_grid.png)
 
 #### 6. Open vs. Closed Models
